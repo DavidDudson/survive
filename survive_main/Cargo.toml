@@ -1,0 +1,10 @@
+[package]
+name = "survive_main"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+castle = { path = "../castle" }
+ui = { path = "../ui" }
+models = { path = "../models" }
+bevy = "0.13.2"
