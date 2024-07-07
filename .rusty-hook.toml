@@ -1,0 +1,5 @@
+[hooks]
+pre-commit = "cargo clippy --fix --allow-staged --allow-dirty && cargo fmt"
+
+[logging]
+verbose = true
