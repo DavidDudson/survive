@@ -1,5 +1,5 @@
-use bevy::prelude::*;
 use crate::castle::Castle;
+use bevy::prelude::*;
 use models::name::Name;
 
 pub struct CastlePlugin;
