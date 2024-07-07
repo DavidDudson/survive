@@ -1,5 +1,5 @@
-use bevy::prelude::*;
 use bevy::diagnostic::LogDiagnosticsPlugin;
+use bevy::prelude::*;
 
 pub struct DiagnosticsPlugin;
 
