@@ -19,10 +19,10 @@ jobs:
           components: clippy
 
       - name: Lint | Clippy
-        uses: actions-rs/clippy-check@v1
+        uses: giraffate/clippy-action@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-targets -- -D warnings
+          reporter: 'github-pr-review'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup | Toolchain (rustfmt)
         uses: actions-rs/toolchain@v1
