@@ -7,4 +7,5 @@ edition = "2021"
 castle = { path = "../castle" }
 ui = { path = "../ui" }
 models = { path = "../models" }
+diagnostics = { path = "../diagnostics" }
 bevy = "0.14.0"

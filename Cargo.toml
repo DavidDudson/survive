@@ -6,4 +6,4 @@ opt-level = 3
 
 [workspace]
 resolver = "2"
-members = ["castle", "models", "survive_main", "ui"]
+members = ["castle", "diagnostics", "models", "survive_main", "ui"]
