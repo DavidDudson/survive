@@ -48,7 +48,6 @@ jobs:
         run: cargo build
 
   test:
-    needs: build
     strategy:
       fail-fast: false
       matrix:
