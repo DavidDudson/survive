@@ -7,30 +7,21 @@ jobs:
     steps:
       - name: Setup | Checkout
         uses: actions/checkout@v3
-
-      - name: Setup | Ubuntu dependencies
-        run: sudo apt install libasound2-dev libudev-dev pkg-config
-
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libasound2-dev libudev-dev pkg-config
       - name: Setup | Toolchain (clippy)
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           default: true
-          components: clippy
-
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
       - name: Lint | Clippy
         uses: giraffate/clippy-action@v1
         with:
           reporter: 'github-pr-review'
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup | Toolchain (rustfmt)
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          default: true
-          components: rustfmt
-
       - name: Lint | Rustfmt
         run: cargo fmt -- --check
 
@@ -49,11 +40,10 @@ jobs:
         with:
           toolchain: nightly
           profile: minimal
-
-      - name: Setup | Ubuntu dependencies
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt install libasound2-dev libudev-dev pkg-config
-
+      - uses: Swatinem/rust-cache@v2
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libasound2-dev libudev-dev pkg-config
       - name: Build
         run: cargo build
 
@@ -67,16 +57,14 @@ jobs:
     steps:
       - name: Setup | Checkout
         uses: actions/checkout@v3
-
       - name: Setup | Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
           profile: minimal
-
-      - name: Setup | Ubuntu dependencies
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt install libasound2-dev libudev-dev pkg-config
-
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libasound2-dev libudev-dev pkg-config
+      - uses: Swatinem/rust-cache@v2
       - name: Test
         run: cargo test
