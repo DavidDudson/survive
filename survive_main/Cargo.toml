@@ -10,7 +10,7 @@ models = { path = "../models" }
 diagnostics = { path = "../diagnostics" }
 level = { path = "../level" }
 enemy = { path = "../enemy" }
-bevy = "0.14.0"
+bevy = "0.14.2"
 
 [dev-dependencies]
 rusty-hook = "0.11.2"
