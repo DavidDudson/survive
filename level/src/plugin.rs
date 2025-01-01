@@ -1,7 +1,6 @@
 use bevy::color::palettes::basic::GREEN;
 use bevy::color::palettes::css::GREY;
 use bevy::prelude::*;
-use bevy::sprite::Mesh2dHandle;
 
 pub struct LevelPlugin;
 
@@ -16,7 +15,7 @@ fn setup(
     meshes: ResMut<Assets<Mesh>>,
     materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2d);
     spawn(commands, meshes, materials);
 }
 
@@ -25,23 +24,19 @@ fn spawn(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn(ColorMesh2dBundle {
-        mesh: Mesh2dHandle::from(meshes.add(Rectangle::new(1920., 540.))),
-        transform: Transform::from_translation(Vec3::new(0., -270., 0.)),
-        material: materials.add(Color::from(GREEN)),
-
-        ..default()
-    });
-    commands.spawn(ColorMesh2dBundle {
-        mesh: Mesh2dHandle::from(meshes.add(Rectangle::new(300., 150.))),
-        material: materials.add(Color::from(GREY)),
-        transform: Transform::from_translation(Vec3::new(1920. / 4., 75., 1.)),
-        ..default()
-    });
-    commands.spawn(SpriteBundle {
-        transform: Transform::from_scale(Vec3::new(64., 64., 0.))
-            .with_translation(Vec3::new(0., 32., 0.)),
-        ..Default::default()
-    });
+    commands.spawn((
+        Mesh2d(meshes.add(Rectangle::new(1920., 540.))),
+        MeshMaterial2d(materials.add(Color::from(GREEN))),
+        Transform::from_translation(Vec3::new(0., -270., 0.)),
+    ));
+    commands.spawn((
+        Mesh2d(meshes.add(Rectangle::new(300., 150.))),
+        MeshMaterial2d(materials.add(Color::from(GREY))),
+        Transform::from_translation(Vec3::new(1920. / 4., 75., 1.)),
+    ));
+    commands.spawn((
+        Sprite::default(),
+        Transform::from_scale(Vec3::new(64., 64., 0.)).with_translation(Vec3::new(0., 32., 0.)),
+    ));
     info!("Spawning complete");
 }
