@@ -1,5 +1,6 @@
 use bevy::diagnostic::LogDiagnosticsPlugin;
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::RapierDebugRenderPlugin;
 
 pub struct DiagnosticsPlugin;
 
@@ -7,6 +8,9 @@ pub struct DiagnosticsPlugin;
 impl Plugin for DiagnosticsPlugin {
     fn build(&self, app: &mut App) {
         println!("DiagnosticsPlugin Plugin Built");
-        app.add_plugins(LogDiagnosticsPlugin::default());
+        app.add_plugins((
+            LogDiagnosticsPlugin::default(),
+            RapierDebugRenderPlugin::default(),
+        ));
     }
 }

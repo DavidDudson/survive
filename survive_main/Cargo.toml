@@ -11,6 +11,8 @@ diagnostics = { path = "../diagnostics" }
 level = { path = "../level" }
 enemy = { path = "../enemy" }
 bevy = "0.15.0"
+bevy_rapier2d  = { version = "0.28.0",  features = ["wasm-bindgen"] }
+
 
 [dev-dependencies]
 rusty-hook = "0.11.2"

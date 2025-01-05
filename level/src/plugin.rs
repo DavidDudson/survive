@@ -1,6 +1,7 @@
 use bevy::color::palettes::basic::GREEN;
-use bevy::color::palettes::css::GREY;
+use bevy::color::palettes::css::{GREY, WHITE};
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 
 pub struct LevelPlugin;
 
@@ -27,16 +28,23 @@ fn spawn(
     commands.spawn((
         Mesh2d(meshes.add(Rectangle::new(1920., 540.))),
         MeshMaterial2d(materials.add(Color::from(GREEN))),
-        Transform::from_translation(Vec3::new(0., -270., 0.)),
+        Transform::from_xyz(0., -270., 0.),
+        RigidBody::Fixed,
+        Collider::cuboid(1920. / 2., 520. / 2.),
     ));
     commands.spawn((
         Mesh2d(meshes.add(Rectangle::new(300., 150.))),
         MeshMaterial2d(materials.add(Color::from(GREY))),
-        Transform::from_translation(Vec3::new(1920. / 4., 75., 1.)),
+        Transform::from_xyz(1920. / 4., 75., 0.),
+        RigidBody::Fixed,
+        Collider::cuboid(300. / 2., 150. / 2.),
     ));
     commands.spawn((
-        Sprite::default(),
-        Transform::from_scale(Vec3::new(64., 64., 0.)).with_translation(Vec3::new(0., 32., 0.)),
+        Mesh2d(meshes.add(Rectangle::new(64., 64.))),
+        MeshMaterial2d(materials.add(Color::from(WHITE))),
+        Transform::from_xyz(0., 60., 0.),
+        RigidBody::Dynamic,
+        Collider::cuboid(64. / 2., 64. / 2.),
     ));
     info!("Spawning complete");
 }

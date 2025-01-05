@@ -7,3 +7,4 @@ edition = "2021"
 bevy = "0.15.0"
 enemy = { path = "../enemy" }
 castle = { path = "../castle" }
+bevy_rapier2d  = { version = "0.28.0",  features = ["wasm-bindgen"] }

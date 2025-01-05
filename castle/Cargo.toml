@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 bevy = "0.15.0"
 models = { path = "../models" }
+bevy_rapier2d  = { version = "0.28.0",  features = ["wasm-bindgen"] }
