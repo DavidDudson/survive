@@ -1,10 +1,9 @@
 use bevy::prelude::*;
-use castle::castle::Castle;
 
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
-    fn build(&self, app: &mut App) {
+    fn build(&self, _app: &mut App) {
         // app.add_systems(Update, move_enemy)
     }
 
