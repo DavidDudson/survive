@@ -6,5 +6,6 @@ edition = "2021"
 [dependencies]
 bevy = "0.15.3"
 enemy = { path = "../enemy" }
+models = { path = "../models" }
 castle = { path = "../castle" }
 bevy_rapier2d  = { version = "0.28.0",  features = ["wasm-bindgen"] }

@@ -12,6 +12,7 @@ fn hello_world() {
 }
 
 fn main() {
+    info!("Var2");
     App::new()
         .add_plugins((
             DefaultPlugins.set(window_plugin()),
