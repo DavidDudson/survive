@@ -1,51 +1,44 @@
 use crate::ground::Ground;
-use bevy::color::palettes::basic::GREEN;
-use bevy::color::palettes::css::{GREY, WHITE};
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::*;
+use castle::castle::Castle;
 use enemy::peasant::Peasant;
+
+// New resource for spawn timer
+#[derive(Resource)]
+struct SpawnTimer(Timer);
 
 pub struct LevelPlugin;
 
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup);
+        app.add_systems(Startup, setup)
+            .add_systems(Update, spawn_waves)
+            .insert_resource(SpawnTimer(Timer::from_seconds(5.0, TimerMode::Repeating)));
     }
 }
 
 fn setup(
     mut commands: Commands,
-    meshes: ResMut<Assets<Mesh>>,
-    materials: ResMut<Assets<ColorMaterial>>,
-) {
-    commands.spawn(Camera2d);
-    spawn(commands, meshes, materials);
-}
-
-fn spawn(
-    mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn((
-        Mesh2d(meshes.add(Rectangle::new(1920., 540.))),
-        MeshMaterial2d(materials.add(Color::from(GREEN))),
-        Transform::from_xyz(0., -270., 0.),
-        Collider::cuboid(1920. / 2., 520. / 2.),
-    ));
-    commands.spawn((
-        Ground,
-        Mesh2d(meshes.add(Rectangle::new(300., 150.))),
-        MeshMaterial2d(materials.add(Color::from(GREY))),
-        Transform::from_xyz(1920. / 4., 75., 0.),
-        Collider::cuboid(300. / 2., 150. / 2.),
-    ));
-    commands.spawn((
-        Peasant,
-        Mesh2d(meshes.add(Rectangle::new(64., 64.))),
-        MeshMaterial2d(materials.add(Color::from(WHITE))),
-        Transform::from_xyz(0., 60., 0.),
-        Collider::cuboid(64. / 2., 64. / 2.),
-    ));
-    info!("Spawning complete");
+    commands.spawn(Camera2d);
+    Ground::spawn(&mut commands, &mut meshes, &mut materials);
+    Castle::spawn(&mut commands, &mut meshes, &mut materials);
+}
+
+fn spawn_waves(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+    time: Res<Time>,
+    mut spawn_timer: ResMut<SpawnTimer>,
+) {
+    // Tick the timer
+    spawn_timer.0.tick(time.delta());
+
+    // Check if the timer has finished
+    if spawn_timer.0.just_finished() {
+        Peasant::spawn(&mut commands, &mut meshes, &mut materials);
+    }
 }

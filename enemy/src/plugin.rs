@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::Velocity;
 use models::speed::Speed;
 
 pub struct EnemyPlugin;
@@ -10,17 +11,13 @@ impl Plugin for EnemyPlugin {
 }
 
 fn move_enemy(
-    time: Res<Time>,
-    enemy: Query<(Entity, &Speed), With<Transform>>,
-    mut transforms: Query<&mut Transform>,
+    _time: Res<Time>,
+    enemy: Query<(Entity, &Speed), With<Velocity>>,
+    mut external_forces: Query<&mut Velocity>,
 ) {
     for (entity, speed) in &enemy {
-        if let Ok(mut transform) = transforms.get_mut(entity) {
-            info!(
-                "Moving enemy {} by {} from {}",
-                entity, speed.0, transform.translation
-            );
-            transform.translation.x += speed.0 * time.delta_secs();
+        if let Ok(mut external_force) = external_forces.get_mut(entity) {
+            external_force.linvel.x = speed.0
         }
     }
 }

@@ -1,5 +1,7 @@
-use crate::enemy::Enemy;
+use crate::enemy::{Enemy, ENEMY_COLLISION_GROUP};
+use bevy::color::palettes::css::WHITE;
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::{Collider, LockedAxes, Velocity};
 use models::attack::Attack;
 use models::entity_health::EntityHealth;
 use models::health::Health;
@@ -18,6 +20,29 @@ use models::textured::Textured;
 )]
 pub struct Peasant;
 
+impl Peasant {
+    pub fn spawn(
+        commands: &mut Commands,
+        meshes: &mut ResMut<Assets<Mesh>>,
+        materials: &mut ResMut<Assets<ColorMaterial>>,
+    ) {
+        info!("Spawning peasant");
+        commands.spawn((
+            Peasant,
+            Mesh2d(meshes.add(Rectangle::new(64., 64.))),
+            MeshMaterial2d(materials.add(Color::from(WHITE))),
+            Transform::from_xyz(-1920. / 2., 0., 0.),
+            Collider::cuboid(64. / 2., 64. / 2.),
+            LockedAxes::ROTATION_LOCKED,
+            Velocity {
+                linvel: Vec2::new(0.0, 0.0),
+                angvel: 0.0,
+            },
+            ENEMY_COLLISION_GROUP,
+        ));
+    }
+}
+
 fn peasant_name() -> Name {
     Name("Peasant".to_string())
 }
@@ -27,7 +52,7 @@ fn peasant_health() -> EntityHealth {
 }
 
 fn peasant_speed() -> Speed {
-    Speed(10.)
+    Speed(50.)
 }
 
 fn peasant_attack() -> Attack {
