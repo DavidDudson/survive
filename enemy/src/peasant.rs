@@ -3,6 +3,7 @@ use bevy::color::palettes::css::WHITE;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::{Collider, LockedAxes, Velocity};
 use models::attack::Attack;
+use models::draggable::Draggable;
 use models::health::Health;
 use models::name::Name;
 use models::speed::Speed;
@@ -27,6 +28,7 @@ impl Peasant {
     ) {
         info!("Spawning peasant");
         commands.spawn((
+            Draggable,
             Peasant,
             Mesh2d(meshes.add(Rectangle::new(64., 64.))),
             MeshMaterial2d(materials.add(Color::from(WHITE))),
