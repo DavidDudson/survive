@@ -1495,6 +1495,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "combat"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "bevy_rapier2d",
+ "castle",
+ "derive_more 2.0.1",
+ "models",
+]
+
+[[package]]
 name = "combine"
 version = "4.6.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4032,6 +4043,7 @@ dependencies = [
  "bevy",
  "bevy_rapier2d",
  "castle",
+ "combat",
  "diagnostics",
  "enemy",
  "husky-rs",

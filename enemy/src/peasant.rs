@@ -3,7 +3,6 @@ use bevy::color::palettes::css::WHITE;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::{Collider, LockedAxes, Velocity};
 use models::attack::Attack;
-use models::entity_health::EntityHealth;
 use models::health::Health;
 use models::name::Name;
 use models::speed::Speed;
@@ -14,7 +13,7 @@ use models::textured::Textured;
     Enemy,
     Name(peasant_name),
     Textured(peasant_texture),
-    EntityHealth(peasant_health),
+    Health(peasant_health),
     Speed(peasant_speed),
     Attack(peasant_attack)
 )]
@@ -47,8 +46,8 @@ fn peasant_name() -> Name {
     Name("Peasant".to_string())
 }
 
-fn peasant_health() -> EntityHealth {
-    EntityHealth(Health(100))
+fn peasant_health() -> Health {
+    Health(100)
 }
 
 fn peasant_speed() -> Speed {
@@ -56,7 +55,7 @@ fn peasant_speed() -> Speed {
 }
 
 fn peasant_attack() -> Attack {
-    Attack::physical(Health(1))
+    Attack::melee(Health(1))
 }
 
 fn peasant_texture() -> Textured {

@@ -2,6 +2,7 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::*;
 use castle::plugin::CastlePlugin;
+use combat::plugin::CombatPlugin;
 use enemy::plugin::EnemyPlugin;
 use level::plugin::LevelPlugin;
 use ui::plugin::UiPlugin;
@@ -22,6 +23,7 @@ fn main() {
             CastlePlugin,
             LevelPlugin,
             EnemyPlugin,
+            CombatPlugin,
             RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0),
         ))
         .add_systems(Startup, hello_world)

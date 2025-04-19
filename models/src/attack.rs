@@ -1,26 +1,34 @@
 use crate::damage_type::DamageType;
+use crate::distance::Distance;
 use crate::health::Health;
+use crate::seconds::Seconds;
 use bevy::prelude::Component;
 use derive_more::Display;
 
-#[derive(Component, Display, Debug)]
+#[derive(Component, Display, Clone, Copy, Debug)]
 #[display("{damage}({damage_type})")]
 pub struct Attack {
-    damage: Health,
-    damage_type: DamageType,
+    pub damage: Health,
+    pub damage_type: DamageType,
+    pub range: Distance,
+    pub cooldown: Seconds,
+    pub last: Option<f32>,
 }
 
 impl Attack {
-    pub fn physical(damage: Health) -> Self {
+    pub fn melee(damage: Health) -> Self {
         Self {
             damage,
             damage_type: DamageType::Physical,
+            range: Distance(200),
+            cooldown: Seconds(1),
+            last: None,
         }
     }
 }
 
 impl Default for Attack {
     fn default() -> Self {
-        Self::physical(Health(1))
+        Self::melee(Health(1))
     }
 }

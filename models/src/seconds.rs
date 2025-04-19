@@ -1,5 +1,5 @@
 use bevy::prelude::Component;
-use derive_more::{Add, AddAssign, AsRef, Display, From, Mul, MulAssign, Sub, SubAssign};
+use derive_more::{Add, AddAssign, Display, From, Mul, MulAssign, Sub, SubAssign};
 
 #[derive(
     Component,
@@ -11,7 +11,6 @@ use derive_more::{Add, AddAssign, AsRef, Display, From, Mul, MulAssign, Sub, Sub
     Sub,
     SubAssign,
     Display,
-    AsRef,
     Ord,
     PartialOrd,
     Eq,
@@ -21,4 +20,4 @@ use derive_more::{Add, AddAssign, AsRef, Display, From, Mul, MulAssign, Sub, Sub
     Copy,
     Default,
 )]
-pub struct Health(pub u16);
+pub struct Seconds(pub u16);
