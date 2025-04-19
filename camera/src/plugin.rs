@@ -13,48 +13,53 @@ struct CameraDrag {
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems(Startup, setup)
-            .add_systems(Update, (
+        app.add_systems(Startup, setup).add_systems(
+            Update,
+            (
                 castle_follow.run_if(not(in_state(GameState::Playing))),
                 camera_drag.run_if(in_state(GameState::Playing)),
-            ));
+            ),
+        );
     }
 }
 
 fn setup(mut commands: Commands) {
-    commands
-        .spawn((
-            Camera2d,
-            CameraDrag { dragging: false, target_scale: 1.0 },
-        ));
+    commands.spawn((
+        Camera2d,
+        CameraDrag {
+            dragging: false,
+            target_scale: 1.0,
+        },
+    ));
 }
 
 fn castle_follow(
-    target_query: Query<(&Transform), With<Castle>>,
-    mut camera_query: Query<(&mut Transform, &mut OrthographicProjection), (With<Camera>, Without<Castle>)>,
+    target_query: Query<&Transform, With<Castle>>,
+    mut camera_query: Query<
+        (&mut Transform, &mut OrthographicProjection),
+        (With<Camera>, Without<Castle>),
+    >,
     time: Res<Time>,
 ) {
     // Get the target position
     if let Ok(target_transform) = target_query.get_single() {
         // Get the camera
         if let Ok((mut camera_transform, mut projection)) = camera_query.get_single_mut() {
-
             let target_position = Vec3::new(
                 target_transform.translation.x,
                 target_transform.translation.y,
                 camera_transform.translation.z,
             );
 
-            camera_transform.translation = camera_transform.translation.lerp(
-                target_position,
-                5.0 * time.delta_secs(),
-            );
+            camera_transform.translation = camera_transform
+                .translation
+                .lerp(target_position, 5.0 * time.delta_secs());
 
             let target_scale = 0.5;
             let current_scale = projection.scale;
 
-            projection.scale = current_scale + (target_scale - current_scale) * 2.0 * time.delta_secs();
+            projection.scale =
+                current_scale + (target_scale - current_scale) * 2.0 * time.delta_secs();
         }
     }
 }
@@ -109,7 +114,7 @@ fn camera_drag(
     // Smoothly interpolate towards the target scale
     if let Ok(mut projection) = projection_query.get_single_mut() {
         let zoom_speed = 5.0; // Adjust this value to control zoom smoothness (higher = faster)
-        projection.scale = projection.scale + (camera_drag.target_scale - projection.scale)
-            * zoom_speed * time.delta_secs();
+        projection.scale = projection.scale
+            + (camera_drag.target_scale - projection.scale) * zoom_speed * time.delta_secs();
     }
 }
