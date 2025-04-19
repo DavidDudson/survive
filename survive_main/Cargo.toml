@@ -11,6 +11,7 @@ diagnostics = { path = "../diagnostics" }
 level = { path = "../level" }
 combat = { path = "../combat" }
 enemy = { path = "../enemy" }
+camera = { path = "../camera" }
 bevy = "0.15.3"
 bevy_rapier2d  = "0.29.0"
 

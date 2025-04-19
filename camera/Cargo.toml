@@ -1,5 +1,5 @@
 [package]
-name = "ui"
+name = "camera"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,4 @@ edition = "2021"
 bevy = "0.15.3"
 models = { path = "../models" }
 castle = { path = "../castle" }
+bevy_rapier2d  = "0.29.0"

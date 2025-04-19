@@ -8,3 +8,4 @@ pub mod name;
 pub mod seconds;
 pub mod speed;
 pub mod textured;
+pub mod game_states;

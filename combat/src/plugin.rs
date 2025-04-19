@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use castle::castle::Castle;
 use models::attack::Attack;
 use models::distance::Distance;
+use models::game_states::GameState;
 use models::health::Health;
 
 pub struct CombatPlugin;
@@ -11,8 +12,9 @@ impl Plugin for CombatPlugin {
     fn build(&self, app: &mut App) {
         let _ = app
             .add_event::<DamageEvent>()
-            .add_systems(Update, (detect_attacks, apply_damage));
+            .add_systems(Update, (detect_attacks, apply_damage).run_if(in_state(GameState::Playing)));
     }
+
 }
 
 // System to detect when characters are in range and send damage events
@@ -43,7 +45,10 @@ fn detect_attacks(
 }
 
 // System to apply damage from events
-fn apply_damage(mut damage_events: EventReader<DamageEvent>, mut health_query: Query<&mut Health>) {
+fn apply_damage(
+    mut damage_events: EventReader<DamageEvent>,
+    mut health_query: Query<&mut Health>,
+    mut next_state: ResMut<NextState<GameState>>,) {
     for event in damage_events.read() {
         if let Ok(mut health) = health_query.get_mut(event.target) {
             if *health > event.attack.damage {
@@ -51,7 +56,8 @@ fn apply_damage(mut damage_events: EventReader<DamageEvent>, mut health_query: Q
                 info!("Castle Health {}", *health)
             } else {
                 health.0 = 0;
-                info!("Castle Died {}", *health)
+                info!("Castle Died {}", *health);
+                next_state.set(GameState::GameOver);
             }
         }
     }

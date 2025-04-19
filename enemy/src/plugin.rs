@@ -1,12 +1,13 @@
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::Velocity;
+use models::game_states::GameState;
 use models::speed::Speed;
 
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        let _ = app.add_systems(Update, move_enemy);
+        let _ = app.add_systems(Update, move_enemy.run_if(in_state(GameState::Playing)));
     }
 }
 

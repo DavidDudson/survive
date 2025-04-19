@@ -16,10 +16,10 @@ impl Ground {
     ) {
         commands.spawn((
             Ground,
-            Mesh2d(meshes.add(Rectangle::new(1920., 540.))),
+            Mesh2d(meshes.add(Rectangle::new(5000., 1000.))),
             MeshMaterial2d(materials.add(Color::from(GREEN))),
-            Transform::from_xyz(0., -270., 0.),
-            Collider::cuboid(1920. / 2., 520. / 2.),
+            Transform::from_xyz(0., -480., 0.),
+            Collider::cuboid(5000. / 2., 980. / 2.),
         ));
     }
 }

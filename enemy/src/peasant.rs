@@ -47,11 +47,11 @@ fn peasant_name() -> Name {
 }
 
 fn peasant_health() -> Health {
-    Health(100)
+    Health(10)
 }
 
 fn peasant_speed() -> Speed {
-    Speed(50.)
+    Speed(100.)
 }
 
 fn peasant_attack() -> Attack {

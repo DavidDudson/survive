@@ -29,7 +29,7 @@ fn castle_name() -> Name {
 }
 
 fn castle_health() -> Health {
-    Health(100)
+    Health(20)
 }
 
 fn castle_body() -> RigidBody {
