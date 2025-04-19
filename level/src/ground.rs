@@ -2,10 +2,11 @@ use crate::scenery::Scenery;
 use bevy::color::palettes::css::GREEN;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::Collider;
+use models::hardness::Hardness;
 use models::name::Name;
 
 #[derive(Component, Default)]
-#[require(Name(ground_name), Scenery)]
+#[require(Name(ground_name), Scenery, Hardness(ground_hardness))]
 pub struct Ground;
 
 impl Ground {
@@ -22,6 +23,10 @@ impl Ground {
             Collider::cuboid(5000. / 2., 980. / 2.),
         ));
     }
+}
+
+fn ground_hardness() -> Hardness {
+    Hardness(1)
 }
 
 fn ground_name() -> Name {

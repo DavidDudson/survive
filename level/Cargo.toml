@@ -7,5 +7,6 @@ edition = "2021"
 bevy = "0.15.3"
 enemy = { path = "../enemy" }
 models = { path = "../models" }
+combat = { path = "../combat" }
 castle = { path = "../castle" }
 bevy_rapier2d  = "0.29.0"

@@ -2610,6 +2610,7 @@ dependencies = [
  "bevy",
  "bevy_rapier2d",
  "castle",
+ "combat",
  "enemy",
  "models",
 ]

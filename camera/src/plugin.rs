@@ -33,7 +33,7 @@ fn setup(mut commands: Commands) {
         CameraDrag {
             dragging: false,
             target_scale: 1.0,
-            last_drag: None
+            last_drag: None,
         },
     ));
 }
@@ -88,7 +88,9 @@ fn camera_drag(
         return;
     }
 
-    if !camera_drag.last_drag.is_none() && time.elapsed_secs() - camera_drag.last_drag.unwrap() < 0.5 {
+    if !camera_drag.last_drag.is_none()
+        && time.elapsed_secs() - camera_drag.last_drag.unwrap() < 0.5
+    {
         camera_drag.dragging = false;
         return;
     }
@@ -135,7 +137,6 @@ fn camera_drag(
             + (camera_drag.target_scale - projection.scale) * zoom_speed * time.delta_secs();
     }
 }
-
 
 // New system for dragging peasants
 fn drag_system(
