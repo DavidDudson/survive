@@ -8,7 +8,7 @@ pub mod game_states;
 pub mod hardness;
 pub mod health;
 pub mod name;
+pub mod scenery;
 pub mod seconds;
 pub mod speed;
 pub mod textured;
-pub mod scenery;

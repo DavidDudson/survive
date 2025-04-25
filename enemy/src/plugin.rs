@@ -19,11 +19,14 @@ fn move_enemy(
     enemy: Query<(Entity, &Speed), (With<Velocity>, Without<Dragged>)>,
     scenery: Query<Entity, With<Scenery>>,
     mut velocity: Query<&mut Velocity>,
-    rapier_context: ReadRapierContext
+    rapier_context: ReadRapierContext,
 ) {
     for (entity, speed) in &enemy {
         if let Ok(mut vel) = velocity.get_mut(entity) {
-            if let Some(_) = rapier_context.single().contact_pair(entity, scenery.single()) {
+            if let Some(_) = rapier_context
+                .single()
+                .contact_pair(entity, scenery.single())
+            {
                 vel.linvel.x = speed.0
             }
         }

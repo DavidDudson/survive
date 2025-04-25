@@ -1,9 +1,9 @@
-use models::scenery::Scenery;
 use bevy::color::palettes::css::GREEN;
 use bevy::prelude::*;
 use bevy_rapier2d::prelude::{ActiveEvents, Collider};
 use models::hardness::Hardness;
 use models::name::Name;
+use models::scenery::Scenery;
 
 #[derive(Component, Default)]
 #[require(Name(ground_name), Scenery, Hardness(ground_hardness))]

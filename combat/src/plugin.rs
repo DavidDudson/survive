@@ -11,12 +11,13 @@ pub struct CombatPlugin;
 
 impl Plugin for CombatPlugin {
     fn build(&self, app: &mut App) {
-        let _ = app.add_event::<DamageEvent>()
+        let _ = app
+            .add_event::<DamageEvent>()
             .add_systems(FixedUpdate, display_collisions)
             .add_systems(
-            Update,
-            (detect_attacks, apply_damage).run_if(in_state(GameState::Playing)),
-        );
+                Update,
+                (detect_attacks, apply_damage).run_if(in_state(GameState::Playing)),
+            );
     }
 }
 

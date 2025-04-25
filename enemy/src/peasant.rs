@@ -40,7 +40,7 @@ impl Peasant {
             Damping {
                 linear_damping: 0.5,
                 angular_damping: 1.0,
-            }
+            },
         ));
     }
 }

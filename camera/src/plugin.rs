@@ -1,7 +1,7 @@
 use bevy::input::mouse::{MouseMotion, MouseWheel};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
-use bevy_rapier2d::prelude::{ExternalImpulse, RigidBody, Velocity};
+use bevy_rapier2d::prelude::ExternalImpulse;
 use castle::castle::Castle;
 use models::draggable::{Draggable, Dragged};
 use models::game_states::GameState;
@@ -95,11 +95,11 @@ fn camera_drag(
 
     // Get the current cursor position
     let current_cursor_pos = window.cursor_position();
-    
+
     if !dragged_entity.is_empty() {
         camera_drag.last_drag = Some(time.elapsed_secs());
         camera_drag.dragging = false;
-        
+
         if let Some(current_pos) = current_cursor_pos {
             if let Some(last_pos) = camera_drag.last_cursor_pos {
                 if let Some(last_time) = camera_drag.last_update_time {
@@ -108,20 +108,24 @@ fn camera_drag(
                         // Calculate velocity (pixels per second)
                         let displacement = current_pos - last_pos;
                         let raw_velocity = displacement / time_delta;
-                        
+
                         // Apply smooth filtering to avoid jitter
                         let smoothing_factor = 0.8; // Adjust as needed (higher = more smoothing)
-                        camera_drag.cursor_velocity = camera_drag.cursor_velocity * smoothing_factor + 
-                                                     raw_velocity * (1.0 - smoothing_factor);
-                        
+                        camera_drag.cursor_velocity = camera_drag.cursor_velocity
+                            * smoothing_factor
+                            + raw_velocity * (1.0 - smoothing_factor);
+
                         if camera_drag.dragging {
                             // Debug output (only when actively dragging)
-                            info!("Cursor velocity: {:?} pixels/sec", camera_drag.cursor_velocity);
+                            info!(
+                                "Cursor velocity: {:?} pixels/sec",
+                                camera_drag.cursor_velocity
+                            );
                         }
                     }
                 }
             }
-            
+
             // Update last position and time
             camera_drag.last_cursor_pos = Some(current_pos);
             camera_drag.last_update_time = Some(current_time);
@@ -195,7 +199,7 @@ fn drag_system(
     camera_query: Query<(&Camera, &GlobalTransform, &CameraDrag)>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
-    mut commands: Commands
+    mut commands: Commands,
 ) {
     let window = window_query.single();
     let (camera, camera_transform, camera_drag) = camera_query.single();
@@ -207,13 +211,13 @@ fn drag_system(
             world_position
         } else {
             if let Ok((entity, _, _)) = dragged.get_single() {
-             commands.entity(entity).remove::<Dragged>();
+                commands.entity(entity).remove::<Dragged>();
             }
             return; // Cursor not in world
         }
     } else {
         if let Ok((entity, _, _)) = dragged.get_single() {
-         commands.entity(entity).remove::<Dragged>();
+            commands.entity(entity).remove::<Dragged>();
         }
         return; // Cursor not in window
     };
@@ -229,9 +233,9 @@ fn drag_system(
             let impulse_scale = 1500.;
 
             let vec = Vec2::new(
-                    camera_drag.cursor_velocity.x * impulse_scale,
-                    -camera_drag.cursor_velocity.y * impulse_scale
-                );
+                camera_drag.cursor_velocity.x * impulse_scale,
+                -camera_drag.cursor_velocity.y * impulse_scale,
+            );
             if let Some(impulse) = external_impulse.as_mut() {
                 impulse.impulse = vec;
                 impulse.torque_impulse = 0.;
