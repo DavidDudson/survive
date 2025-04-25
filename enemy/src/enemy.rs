@@ -1,6 +1,6 @@
 use bevy::prelude::Component;
 use bevy_rapier2d::geometry::{CollisionGroups, Group};
-use bevy_rapier2d::prelude::RigidBody;
+use bevy_rapier2d::prelude::{RigidBody, Velocity};
 use models::attack::Attack;
 use models::hardness::Hardness;
 use models::health::Health;
@@ -21,7 +21,8 @@ pub const ENEMY_COLLISION_GROUP: CollisionGroups =
     Textured,
     Health,
     RigidBody(entity_body),
-    Hardness
+    Hardness,
+    Velocity
 )]
 pub struct Enemy {}
 

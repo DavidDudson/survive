@@ -16,7 +16,7 @@ fn main() {
             DefaultPlugins.set(window_plugin()),
             CameraPlugin,
             LogDiagnosticsPlugin::default(),
-            FrameTimeDiagnosticsPlugin,
+            // FrameTimeDiagnosticsPlugin,
             UiPlugin,
             CastlePlugin,
             LevelPlugin,

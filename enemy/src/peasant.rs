@@ -1,7 +1,7 @@
 use crate::enemy::{Enemy, ENEMY_COLLISION_GROUP};
 use bevy::color::palettes::css::WHITE;
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::{Collider, LockedAxes, Velocity};
+use bevy_rapier2d::prelude::{ActiveEvents, Collider, Damping, LockedAxes};
 use models::attack::Attack;
 use models::draggable::Draggable;
 use models::health::Health;
@@ -35,11 +35,12 @@ impl Peasant {
             Transform::from_xyz(-1920. / 2., 0., 0.),
             Collider::cuboid(64. / 2., 64. / 2.),
             LockedAxes::ROTATION_LOCKED,
-            Velocity {
-                linvel: Vec2::new(0.0, 0.0),
-                angvel: 0.0,
-            },
             ENEMY_COLLISION_GROUP,
+            ActiveEvents::COLLISION_EVENTS,
+            Damping {
+                linear_damping: 0.5,
+                angular_damping: 1.0,
+            }
         ));
     }
 }
@@ -49,7 +50,7 @@ fn peasant_name() -> Name {
 }
 
 fn peasant_health() -> Health {
-    Health(10)
+    Health(1)
 }
 
 fn peasant_speed() -> Speed {

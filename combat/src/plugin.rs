@@ -1,5 +1,6 @@
 use crate::events::damage::DamageEvent;
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 use castle::castle::Castle;
 use models::attack::Attack;
 use models::distance::Distance;
@@ -10,10 +11,18 @@ pub struct CombatPlugin;
 
 impl Plugin for CombatPlugin {
     fn build(&self, app: &mut App) {
-        let _ = app.add_event::<DamageEvent>().add_systems(
+        let _ = app.add_event::<DamageEvent>()
+            .add_systems(FixedUpdate, display_collisions)
+            .add_systems(
             Update,
             (detect_attacks, apply_damage).run_if(in_state(GameState::Playing)),
         );
+    }
+}
+
+fn display_collisions(collision_events: Query<&ActiveEvents>) {
+    for collision_event in collision_events.iter() {
+        println!("Received collision event: {:?}", collision_event);
     }
 }
 

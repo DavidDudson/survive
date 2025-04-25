@@ -1,6 +1,7 @@
 use bevy::input::mouse::{MouseMotion, MouseWheel};
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
+use bevy_rapier2d::prelude::{ExternalImpulse, RigidBody, Velocity};
 use castle::castle::Castle;
 use models::draggable::{Draggable, Dragged};
 use models::game_states::GameState;
@@ -12,6 +13,9 @@ struct CameraDrag {
     dragging: bool,
     target_scale: f32,
     last_drag: Option<f32>,
+    last_cursor_pos: Option<Vec2>,
+    cursor_velocity: Vec2,
+    last_update_time: Option<f32>,
 }
 
 impl Plugin for CameraPlugin {
@@ -34,6 +38,9 @@ fn setup(mut commands: Commands) {
             dragging: false,
             target_scale: 1.0,
             last_drag: None,
+            last_cursor_pos: None,
+            cursor_velocity: Vec2::ZERO,
+            last_update_time: None,
         },
     ));
 }
@@ -78,13 +85,48 @@ fn camera_drag(
     mut projection_query: Query<&mut OrthographicProjection, With<Camera>>,
     dragged_entity: Query<&Dragged>,
     time: Res<Time>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     // Handle camera dragging
     let (mut camera_transform, mut camera_drag) = camera_query.single_mut();
 
+    let current_time = time.elapsed_secs();
+    let window = window_query.single();
+
+    // Get the current cursor position
+    let current_cursor_pos = window.cursor_position();
+    
     if !dragged_entity.is_empty() {
         camera_drag.last_drag = Some(time.elapsed_secs());
         camera_drag.dragging = false;
+        
+        if let Some(current_pos) = current_cursor_pos {
+            if let Some(last_pos) = camera_drag.last_cursor_pos {
+                if let Some(last_time) = camera_drag.last_update_time {
+                    let time_delta = current_time - last_time;
+                    if time_delta > 0.0 {
+                        // Calculate velocity (pixels per second)
+                        let displacement = current_pos - last_pos;
+                        let raw_velocity = displacement / time_delta;
+                        
+                        // Apply smooth filtering to avoid jitter
+                        let smoothing_factor = 0.8; // Adjust as needed (higher = more smoothing)
+                        camera_drag.cursor_velocity = camera_drag.cursor_velocity * smoothing_factor + 
+                                                     raw_velocity * (1.0 - smoothing_factor);
+                        
+                        if camera_drag.dragging {
+                            // Debug output (only when actively dragging)
+                            info!("Cursor velocity: {:?} pixels/sec", camera_drag.cursor_velocity);
+                        }
+                    }
+                }
+            }
+            
+            // Update last position and time
+            camera_drag.last_cursor_pos = Some(current_pos);
+            camera_drag.last_update_time = Some(current_time);
+        }
+
         return;
     }
 
@@ -92,17 +134,24 @@ fn camera_drag(
         && time.elapsed_secs() - camera_drag.last_drag.unwrap() < 0.5
     {
         camera_drag.dragging = false;
+        camera_drag.last_cursor_pos = None;
+        camera_drag.cursor_velocity = Vec2::ZERO;
+        camera_drag.last_update_time = None;
         return;
     }
 
     // Start dragging when middle mouse button is pressed
     if mouse_button.just_pressed(MouseButton::Left) {
         camera_drag.dragging = true;
+        camera_drag.last_cursor_pos = current_cursor_pos;
+        camera_drag.last_update_time = Some(current_time);
     }
 
     // Stop dragging when middle mouse button is released
     if mouse_button.just_released(MouseButton::Left) {
         camera_drag.dragging = false;
+        camera_drag.last_cursor_pos = None;
+        camera_drag.last_update_time = None;
     }
 
     // Move camera if dragging
@@ -141,14 +190,15 @@ fn camera_drag(
 // New system for dragging peasants
 fn drag_system(
     // Assuming you have a Peasant component defined elsewhere
-    mut query: Query<(Entity, &mut Transform, Option<&Dragged>), With<Draggable>>,
-    camera_query: Query<(&Camera, &GlobalTransform)>,
+    draggable: Query<(Entity, &mut Transform), (With<Draggable>, Without<Dragged>)>,
+    mut dragged: Query<(Entity, &mut Transform, Option<&mut ExternalImpulse>), With<Dragged>>,
+    camera_query: Query<(&Camera, &GlobalTransform, &CameraDrag)>,
     window_query: Query<&Window, With<PrimaryWindow>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
-    mut commands: Commands,
+    mut commands: Commands
 ) {
     let window = window_query.single();
-    let (camera, camera_transform) = camera_query.single();
+    let (camera, camera_transform, camera_drag) = camera_query.single();
 
     // Get the current mouse position in world coordinates
     let cursor_position = if let Some(cursor_position) = window.cursor_position() {
@@ -156,42 +206,53 @@ fn drag_system(
         if let Ok(world_position) = camera.viewport_to_world_2d(camera_transform, cursor_position) {
             world_position
         } else {
+            if let Ok((entity, _, _)) = dragged.get_single() {
+             commands.entity(entity).remove::<Dragged>();
+            }
             return; // Cursor not in world
         }
     } else {
+        if let Ok((entity, _, _)) = dragged.get_single() {
+         commands.entity(entity).remove::<Dragged>();
+        }
         return; // Cursor not in window
     };
 
     // Check if we're already dragging a peasant
     let mut dragging = false;
-    for (entity, mut transform, dragged) in query.iter_mut() {
-        if dragged.is_some() {
-            dragging = true;
+    if let Ok((entity, mut transform, mut external_impulse)) = dragged.get_single_mut() {
+        dragging = true;
 
+        // If mouse button is released, stop dragging
+        if mouse_button.just_released(MouseButton::Left) {
+            commands.entity(entity).remove::<Dragged>();
+            let impulse_scale = 1500.;
+
+            let vec = Vec2::new(
+                    camera_drag.cursor_velocity.x * impulse_scale,
+                    -camera_drag.cursor_velocity.y * impulse_scale
+                );
+            if let Some(impulse) = external_impulse.as_mut() {
+                impulse.impulse = vec;
+                impulse.torque_impulse = 0.;
+            } else {
+                commands.entity(entity).insert(ExternalImpulse {
+                    impulse: vec,
+                    torque_impulse: 0.,
+                });
+                info!("{}", camera_drag.cursor_velocity)
+            }
+        } else {
             // Update the position of the dragged peasant to follow the cursor
             transform.translation.x = cursor_position.x;
             transform.translation.y = cursor_position.y;
-
-            // If mouse button is released, stop dragging
-            if mouse_button.just_released(MouseButton::Left) {
-                commands.entity(entity).remove::<Dragged>();
-            }
-
-            break; // Only one peasant can be dragged at a time
         }
     }
 
-    // If we're not already dragging a peasant and the left mouse button was just pressed,
-    // check if we clicked on a peasant
     if !dragging && mouse_button.just_pressed(MouseButton::Left) {
-        for (entity, transform, _) in query.iter() {
-            // Simple distance check to see if we clicked on this peasant
-            // You might want to use a more sophisticated collision detection system
+        for (entity, transform) in draggable.iter() {
             let peasant_pos = Vec2::new(transform.translation.x, transform.translation.y);
             let distance = cursor_position.distance(peasant_pos);
-
-            // If the cursor is close enough to the peasant, start dragging it
-            // Adjust the threshold based on your peasant's size
             if distance < 40.0 {
                 commands.entity(entity).insert(Dragged);
                 break; // Only pick up one peasant at a time

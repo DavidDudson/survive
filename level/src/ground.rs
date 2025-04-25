@@ -1,7 +1,7 @@
-use crate::scenery::Scenery;
+use models::scenery::Scenery;
 use bevy::color::palettes::css::GREEN;
 use bevy::prelude::*;
-use bevy_rapier2d::prelude::Collider;
+use bevy_rapier2d::prelude::{ActiveEvents, Collider};
 use models::hardness::Hardness;
 use models::name::Name;
 
@@ -21,6 +21,7 @@ impl Ground {
             MeshMaterial2d(materials.add(Color::from(GREEN))),
             Transform::from_xyz(0., -480., 0.),
             Collider::cuboid(5000. / 2., 980. / 2.),
+            ActiveEvents::COLLISION_EVENTS,
         ));
     }
 }
