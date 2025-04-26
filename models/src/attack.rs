@@ -25,6 +25,16 @@ impl Attack {
             last: None,
         }
     }
+    
+    pub fn fall(damage: Health) -> Self {
+        Self {
+            damage,
+            damage_type: DamageType::Fall,
+            range: Distance(0),
+            cooldown: Seconds(0),
+            last: None,
+        }
+    }
 }
 
 impl Default for Attack {

@@ -4,6 +4,7 @@ use bevy::prelude::*;
 use bevy_rapier2d::prelude::{ActiveEvents, Collider, Damping, LockedAxes};
 use models::attack::Attack;
 use models::draggable::Draggable;
+use models::hardness::Hardness;
 use models::health::Health;
 use models::name::Name;
 use models::speed::Speed;
@@ -36,11 +37,12 @@ impl Peasant {
             Collider::cuboid(64. / 2., 64. / 2.),
             LockedAxes::ROTATION_LOCKED,
             ENEMY_COLLISION_GROUP,
-            ActiveEvents::COLLISION_EVENTS,
+            ActiveEvents::CONTACT_FORCE_EVENTS,
             Damping {
                 linear_damping: 0.5,
                 angular_damping: 1.0,
             },
+            Hardness(1)
         ));
     }
 }
@@ -50,7 +52,7 @@ fn peasant_name() -> Name {
 }
 
 fn peasant_health() -> Health {
-    Health(1)
+    Health(5)
 }
 
 fn peasant_speed() -> Speed {

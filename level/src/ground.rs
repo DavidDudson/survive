@@ -27,7 +27,7 @@ impl Ground {
 }
 
 fn ground_hardness() -> Hardness {
-    Hardness(1)
+    Hardness(3)
 }
 
 fn ground_name() -> Name {
