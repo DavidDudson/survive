@@ -21,7 +21,7 @@ impl Castle {
             MeshMaterial2d(materials.add(Color::from(GREY))),
             Transform::from_xyz(1920. / 4., 75., 0.),
             Collider::cuboid(300. / 2., 150. / 2.),
-            Hardness(10)
+            Hardness(10),
         ));
     }
 }

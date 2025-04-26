@@ -15,5 +15,5 @@ pub struct DamageEvent {
 pub struct DeathEvent {
     pub target: Entity,
     pub attack: Attack,
-    pub source: Entity
+    pub source: Entity,
 }

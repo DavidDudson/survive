@@ -42,7 +42,7 @@ impl Peasant {
                 linear_damping: 0.5,
                 angular_damping: 1.0,
             },
-            Hardness(1)
+            Hardness(1),
         ));
     }
 }

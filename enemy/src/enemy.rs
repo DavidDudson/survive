@@ -22,7 +22,7 @@ pub const ENEMY_COLLISION_GROUP: CollisionGroups =
     Health,
     RigidBody(entity_body),
     Hardness,
-    Velocity,
+    Velocity
 )]
 pub struct Enemy {}
 

@@ -25,7 +25,7 @@ impl Attack {
             last: None,
         }
     }
-    
+
     pub fn fall(damage: Health) -> Self {
         Self {
             damage,

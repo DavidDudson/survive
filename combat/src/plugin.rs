@@ -17,7 +17,13 @@ impl Plugin for CombatPlugin {
             .add_event::<DeathEvent>()
             .add_systems(
                 Update,
-                (detect_attacks, apply_damage, handle_collisions, handle_deaths).run_if(in_state(GameState::Playing)),
+                (
+                    detect_attacks,
+                    apply_damage,
+                    handle_collisions,
+                    handle_deaths,
+                )
+                    .run_if(in_state(GameState::Playing)),
             );
     }
 }
@@ -32,14 +38,17 @@ fn handle_collisions(
         let entity2 = collision_event.collider2;
         let force = collision_event.max_force_magnitude;
         let force_to_damage = (force / 100000000.0).round().clamp(0.0, u16::MAX as f32) as u16;
-        
+
         if force_to_damage < 1 {
             continue;
         }
-        
+
         if let (Ok(h1), Ok(h2)) = (query_hardness.get(entity1), query_hardness.get(entity2)) {
             if h1 > h2 {
-                info!("Received collision event: {:?} {:?} {:?}", h1, h2, force_to_damage);
+                info!(
+                    "Received collision event: {:?} {:?} {:?}",
+                    h1, h2, force_to_damage
+                );
                 damage_events.send(DamageEvent {
                     target: entity2,
                     attack: Attack::melee(Health(force_to_damage)),
@@ -54,7 +63,11 @@ fn handle_collisions(
                 });
             }
         } else {
-            info!("Not ok {:?} {:?}", query_hardness.get(entity1), query_hardness.get(entity2));
+            info!(
+                "Not ok {:?} {:?}",
+                query_hardness.get(entity1),
+                query_hardness.get(entity2)
+            );
         }
     }
 }
@@ -112,7 +125,7 @@ fn handle_deaths(
     castle: Query<&Castle>,
     mut damage_events: EventReader<DeathEvent>,
     mut next_state: ResMut<NextState<GameState>>,
-    mut commands: Commands
+    mut commands: Commands,
 ) {
     for event in damage_events.read() {
         if let Ok(_) = castle.get(event.target) {
