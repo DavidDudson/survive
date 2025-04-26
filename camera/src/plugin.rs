@@ -23,7 +23,7 @@ impl Plugin for CameraPlugin {
         app.add_systems(Startup, setup).add_systems(
             Update,
             (
-                castle_follow.run_if(not(in_state(GameState::Playing))),
+                castle_follow.run_if(not(in_state(GameState::Playing).or(in_state(GameState::Paused)))),
                 camera_drag.run_if(in_state(GameState::Playing)),
                 drag_system.run_if(in_state(GameState::Playing)),
             ),
@@ -180,7 +180,7 @@ fn camera_drag(
 
     if zoom_delta != 0.0 {
         // Update the target scale based on the zoom delta
-        camera_drag.target_scale = (camera_drag.target_scale + zoom_delta).clamp(0.1, 4.0);
+        camera_drag.target_scale = (camera_drag.target_scale + zoom_delta).clamp(0.1, 2.0);
     }
 
     // Smoothly interpolate towards the target scale

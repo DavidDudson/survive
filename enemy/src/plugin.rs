@@ -25,7 +25,7 @@ fn move_enemy(
         if let Ok(mut vel) = velocity.get_mut(entity) {
             if let Some(_) = rapier_context
                 .single()
-                .contact_pair(entity, scenery.single())
+                .contact_pair(entity, scenery.iter().next().unwrap())
             {
                 vel.linvel.x = speed.0
             }
