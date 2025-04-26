@@ -41,37 +41,38 @@ impl Plugin for UiPlugin {
 }
 
 fn setup_main_menu(mut commands: Commands) {
-    commands.spawn((
-        MainMenu,
-        Node {
-            position_type: PositionType::Absolute,
-            display: Display::Flex,
-            flex_direction: FlexDirection::Column,
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
-            width: Val::Percent(100.0),
-            height: Val::Percent(100.0),
-            ..Node::default()
-        },
-    ))
-    .with_children(|parent| {
-        parent.spawn((
-            Text::new("Main Menu".to_string()),
+    commands
+        .spawn((
+            MainMenu,
             Node {
-                margin: UiRect::bottom(Val::Px(20.0)),
+                position_type: PositionType::Absolute,
+                display: Display::Flex,
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
                 ..Node::default()
             },
-        ));
-        parent.spawn((
-            Button,
-            Text::new("Start Game".to_string()),
-            Node {
-                margin: UiRect::all(Val::Px(10.0)),
-                padding: UiRect::all(Val::Px(10.0)),
-                ..Node::default()
-            },
-        ));
-    });
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                Text::new("Main Menu".to_string()),
+                Node {
+                    margin: UiRect::bottom(Val::Px(20.0)),
+                    ..Node::default()
+                },
+            ));
+            parent.spawn((
+                Button,
+                Text::new("Start Game".to_string()),
+                Node {
+                    margin: UiRect::all(Val::Px(10.0)),
+                    padding: UiRect::all(Val::Px(10.0)),
+                    ..Node::default()
+                },
+            ));
+        });
 }
 
 fn setup_game_over_menu(mut commands: Commands) {
@@ -159,29 +160,30 @@ fn handle_window_focus(
 }
 
 fn setup_pause_menu(mut commands: Commands) {
-    commands.spawn((
-        PauseMenu,
-        Node {
-            position_type: PositionType::Absolute,
-            display: Display::Flex,
-            flex_direction: FlexDirection::Column,
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
-            width: Val::Percent(100.0),
-            height: Val::Percent(100.0),
-            ..Node::default()
-        },
-        BackgroundColor(Color::rgba(0.0, 0.0, 0.0, 0.5)),
-    ))
-    .with_children(|parent| {
-        parent.spawn((
-            Text::new("Paused".to_string()),
+    commands
+        .spawn((
+            PauseMenu,
             Node {
-                margin: UiRect::bottom(Val::Px(20.0)),
+                position_type: PositionType::Absolute,
+                display: Display::Flex,
+                flex_direction: FlexDirection::Column,
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
                 ..Node::default()
             },
-        ));
-    });
+            BackgroundColor(Color::rgba(0.0, 0.0, 0.0, 0.5)),
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                Text::new("Paused".to_string()),
+                Node {
+                    margin: UiRect::bottom(Val::Px(20.0)),
+                    ..Node::default()
+                },
+            ));
+        });
 }
 
 fn cleanup_pause_menu(mut commands: Commands, query: Query<Entity, With<PauseMenu>>) {

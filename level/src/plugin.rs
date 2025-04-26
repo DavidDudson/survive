@@ -14,7 +14,10 @@ pub struct LevelPlugin;
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::Playing), setup)
-            .add_systems(OnExit(GameState::Playing), cleanup.run_if(not(in_state(GameState::Paused))))
+            .add_systems(
+                OnExit(GameState::Playing),
+                cleanup.run_if(not(in_state(GameState::Paused))),
+            )
             .add_systems(Update, spawn_waves.run_if(in_state(GameState::Playing)))
             .insert_resource(SpawnTimer(Timer::from_seconds(5.0, TimerMode::Repeating)));
     }
