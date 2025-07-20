@@ -232,7 +232,7 @@ fn drag_system(
         // If mouse button is released, stop dragging
         if mouse_button.just_released(MouseButton::Left) {
             commands.entity(entity).remove::<Dragged>();
-            let impulse_scale = 1500.;
+            let impulse_scale = 100.;
 
             let vec = Vec2::new(
                 camera_drag.cursor_velocity.x * impulse_scale,
