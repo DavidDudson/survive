@@ -1,5 +1,6 @@
 [build]
 target = "wasm32-unknown-unknown"
+incremental = true
 
 [target.wasm32-unknown-unknown]
 runner = "wasm-server-runner"

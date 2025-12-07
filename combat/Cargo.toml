@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-bevy = "0.15.3"
+bevy = "0.16.1"
 models = { path = "../models" }
 castle = { path = "../castle" }
-bevy_rapier2d  = "0.29.0"
+bevy_rapier2d  = "0.31.0"
 derive_more = { version = "2.0.1", features = ["full"] }
