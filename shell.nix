@@ -10,6 +10,9 @@ in
       clang
       # Replace llvmPackages with llvmPackages_X, where X is the latest LLVM version (at the time of writing, 16)
       llvmPackages.bintools
+      marksman
+      taplo
+      vscode-langservers-extracted
       rust-analyzer
       rustup
     ];
