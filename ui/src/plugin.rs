@@ -107,9 +107,9 @@ fn update_health_text(
     mut text_query: Query<&mut Text, With<HealthText>>,
 ) {
     // Get the castle's health
-    if let Ok(health) = castle_query.get_single() {
+    if let Ok(health) = castle_query.single() {
         // Get the health text
-        if let Ok(mut text) = text_query.get_single_mut() {
+        if let Ok(mut text) = text_query.single_mut() {
             // Update the text with the current health value
             text.0 = format!("Health: {}", health.0);
         }
@@ -129,24 +129,24 @@ fn button_system(
 
 fn cleanup_hud(mut commands: Commands, query: Query<Entity, With<HUD>>) {
     for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
 fn cleanup_main_menu(mut commands: Commands, query: Query<Entity, With<MainMenu>>) {
     for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
 fn cleanup_game_over_menu(mut commands: Commands, query: Query<Entity, With<GameOverMenu>>) {
     for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
 
 fn handle_window_focus(
-    mut focus_events: EventReader<WindowFocused>,
+    mut focus_events: MessageReader<WindowFocused>,
     mut next_state: ResMut<NextState<GameState>>,
     current_state: Res<State<GameState>>,
 ) {
@@ -173,7 +173,7 @@ fn setup_pause_menu(mut commands: Commands) {
                 height: Val::Percent(100.0),
                 ..Node::default()
             },
-            BackgroundColor(Color::rgba(0.0, 0.0, 0.0, 0.5)),
+            BackgroundColor(Color::srgba(0.0, 0.0, 0.0, 0.5)),
         ))
         .with_children(|parent| {
             parent.spawn((
@@ -188,6 +188,6 @@ fn setup_pause_menu(mut commands: Commands) {
 
 fn cleanup_pause_menu(mut commands: Commands, query: Query<Entity, With<PauseMenu>>) {
     for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }

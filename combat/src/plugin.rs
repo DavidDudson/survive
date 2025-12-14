@@ -13,8 +13,8 @@ pub struct CombatPlugin;
 impl Plugin for CombatPlugin {
     fn build(&self, app: &mut App) {
         let _ = app
-            .add_event::<DamageEvent>()
-            .add_event::<DeathEvent>()
+            .add_message::<DamageEvent>()
+            .add_message::<DeathEvent>()
             .add_systems(
                 Update,
                 (
@@ -30,8 +30,8 @@ impl Plugin for CombatPlugin {
 
 fn handle_collisions(
     query_hardness: Query<&Hardness>,
-    mut collision_events: EventReader<ContactForceEvent>,
-    mut damage_events: EventWriter<DamageEvent>,
+    mut collision_events: MessageReader<ContactForceEvent>,
+    mut damage_events: MessageWriter<DamageEvent>,
 ) {
     for collision_event in collision_events.read() {
         let entity1 = collision_event.collider1;
@@ -49,14 +49,14 @@ fn handle_collisions(
                     "Received collision event: {:?} {:?} {:?}",
                     h1, h2, force_to_damage
                 );
-                damage_events.send(DamageEvent {
+                damage_events.write(DamageEvent {
                     target: entity2,
                     attack: Attack::melee(Health(force_to_damage)),
                     source: entity1,
                 });
             } else {
                 info!("Received collision event: {:?} {:?} {:?}", h2, h1, force);
-                damage_events.send(DamageEvent {
+                damage_events.write(DamageEvent {
                     target: entity1,
                     attack: Attack::fall(Health(force_to_damage)),
                     source: entity2,
@@ -77,9 +77,9 @@ fn detect_attacks(
     time: Res<Time>,
     mut character_query: Query<(Entity, &Transform, &mut Attack), With<Attack>>,
     castle_query: Query<(Entity, &Transform), With<Castle>>,
-    mut damage_events: EventWriter<DamageEvent>,
+    mut damage_events: MessageWriter<DamageEvent>,
 ) {
-    if let Ok((castle_entity, castle_transform)) = castle_query.get_single() {
+    if let Ok((castle_entity, castle_transform)) = castle_query.single() {
         for (character_entity, transform, mut attack) in &mut character_query {
             let center_distance = transform.translation.distance(castle_transform.translation);
 
@@ -88,7 +88,7 @@ fn detect_attacks(
                     || time.elapsed_secs() - attack.last.unwrap() > attack.cooldown.0.into()
                 {
                     attack.last = Some(time.elapsed_secs());
-                    damage_events.send(DamageEvent {
+                    damage_events.write(DamageEvent {
                         target: castle_entity,
                         attack: attack.clone(),
                         source: character_entity,
@@ -101,8 +101,8 @@ fn detect_attacks(
 
 // System to apply damage from events
 fn apply_damage(
-    mut damage_events: EventReader<DamageEvent>,
-    mut death_events: EventWriter<DeathEvent>,
+    mut damage_events: MessageReader<DamageEvent>,
+    mut death_events: MessageWriter<DeathEvent>,
     mut health_query: Query<&mut Health>,
 ) {
     for event in damage_events.read() {
@@ -111,7 +111,7 @@ fn apply_damage(
                 *health -= event.attack.damage;
             } else {
                 health.0 = 0;
-                death_events.send(DeathEvent {
+                death_events.write(DeathEvent {
                     target: event.target,
                     attack: event.attack,
                     source: event.source,
@@ -123,7 +123,7 @@ fn apply_damage(
 
 fn handle_deaths(
     castle: Query<&Castle>,
-    mut damage_events: EventReader<DeathEvent>,
+    mut damage_events: MessageReader<DeathEvent>,
     mut next_state: ResMut<NextState<GameState>>,
     mut commands: Commands,
 ) {
@@ -131,7 +131,7 @@ fn handle_deaths(
         if let Ok(_) = castle.get(event.target) {
             next_state.set(GameState::GameOver);
         } else {
-            commands.entity(event.target).despawn_recursive();
+            commands.entity(event.target).despawn();
         }
     }
 }

@@ -20,12 +20,8 @@ pub const ENEMY_COLLISION_GROUP: CollisionGroups =
     Attack,
     Textured,
     Health,
-    RigidBody(entity_body),
+    RigidBody::Dynamic,
     Hardness,
     Velocity
 )]
 pub struct Enemy {}
-
-fn entity_body() -> RigidBody {
-    RigidBody::Dynamic
-}

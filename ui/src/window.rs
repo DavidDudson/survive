@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 use bevy::window::*;
 
-const SCREEN_WIDTH: f32 = 1920.;
-const SCREEN_HEIGHT: f32 = 1080.;
+const SCREEN_WIDTH: u32 = 1920;
+const SCREEN_HEIGHT: u32 = 1080;
 
 pub fn window_plugin() -> WindowPlugin {
     WindowPlugin {

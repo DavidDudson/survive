@@ -15,20 +15,7 @@ use models::speed::Speed;
 use models::textured::Textured;
 
 #[derive(Component)]
-pub struct Limb {
-    pub parent: Entity,
-    pub offset: Vec2,
-}
-
-#[derive(Component)]
-#[require(
-    Enemy,
-    Name(peasant_name),
-    Textured(peasant_texture),
-    Health(peasant_health),
-    Speed(peasant_speed),
-    Attack(peasant_attack)
-)]
+#[require(Enemy, Name, Textured, Health, Speed, Attack)]
 pub struct Peasant;
 
 #[derive(Component)]
@@ -53,114 +40,30 @@ impl Peasant {
         materials: &mut ResMut<Assets<ColorMaterial>>,
     ) {
         info!("Spawning peasant");
-        
-        // Spawn main body (thin segment)
-        let body = commands.spawn((
-            Draggable,
-            Peasant,
-            Mesh2d(meshes.add(Rectangle::new(8., 32.))),
-            MeshMaterial2d(materials.add(Color::from(WHITE))),
-            Transform::from_xyz(-1920. / 2., 0., 0.),
-            Collider::cuboid(4., 16.),
-            LockedAxes::ROTATION_LOCKED,
-            ENEMY_COLLISION_GROUP,
-            ActiveEvents::CONTACT_FORCE_EVENTS,
-            RigidBody::Dynamic,
-            Damping {
-                linear_damping: 0.8,
-                angular_damping: 1.0,
-            },
-            Hardness(1),
-            AdditionalMassProperties::Mass(10.0),
-        )).id();
-
-        // Spawn head
-        let head = commands.spawn((
-            Mesh2d(meshes.add(Circle::new(12.))),
-            MeshMaterial2d(materials.add(Color::from(WHITE))),
-            Transform::from_xyz(0., 24., 0.),
-            Collider::ball(12.),
-            ENEMY_COLLISION_GROUP,
-            Limb { parent: body, offset: Vec2::new(0., 24.) },
-            RigidBody::Dynamic,
-            Damping {
-                linear_damping: 0.95,
-                angular_damping: 1.0,
-            },
-            AdditionalMassProperties::Mass(12.0),
-            LockedAxes::ROTATION_LOCKED,
-        )).id();
-
-        // Create revolute joint for head
-        let revolute = RevoluteJointBuilder::new()
-            .local_anchor1(Vec2::new(0., 16.))
-            .local_anchor2(Vec2::new(0., -12.))
-            .limits([-std::f32::consts::PI/4., std::f32::consts::PI/4.])
-            .build();
-        commands.spawn(ImpulseJoint::new(body, revolute));
-
-        // Spawn limbs
-        let limb_offsets = [
-            Vec2::new(-16., -8.),  // Left arm
-            Vec2::new(16., -8.),   // Right arm
-            Vec2::new(-8., -24.),  // Left leg
-            Vec2::new(8., -24.),   // Right leg
-        ];
-
-        for (i, offset) in limb_offsets.iter().enumerate() {
-            let limb = commands.spawn((
-                Mesh2d(meshes.add(Rectangle::new(6.,16.))),
+        commands
+            .spawn((
+                Draggable,
+                Peasant,
+                Name("Peasant".to_string()),
+                Textured {
+                    file: "enemy/Enemy.png".to_string(),
+                },
+                Health(5),
+                Speed(100.),
+                Attack::melee(Health(1)),
+                Mesh2d(meshes.add(Rectangle::new(64., 64.))),
                 MeshMaterial2d(materials.add(Color::from(WHITE))),
-                Transform::from_xyz(offset.x, offset.y, 0.),
-                Collider::cuboid(3., 16.),
+                Transform::from_xyz(-1920. / 2., 0., 0.),
+                Collider::cuboid(64. / 2., 64. / 2.),
+                LockedAxes::ROTATION_LOCKED,
                 ENEMY_COLLISION_GROUP,
-                Limb { parent: body, offset: *offset },
-                RigidBody::Dynamic,
-                Damping {
-                    linear_damping: 0.9,
-                    angular_damping: 1.0,
-                },
-                AdditionalMassProperties::Mass(3.0),
-                WalkingAnimation {
-                    phase: if i < 2 { 
-                        if i == 0 { std::f32::consts::PI } else { 0.0 }
-                    } else {
-                        if i == 2 { 0.0 } else { std::f32::consts::PI }
-                    },
-                    speed: 6.0,
-                },
-            )).id();
-
-            // Create revolute joint for limb
-            let revolute = RevoluteJointBuilder::new()
-                .local_anchor1(*offset)
-                .local_anchor2(Vec2::ZERO)
-                .limits([-std::f32::consts::PI/2., std::f32::consts::PI/2.])
-                .build();
-            commands.spawn(ImpulseJoint::new(body, revolute));
-        }
-    }
-}
-
-fn peasant_name() -> Name {
-    Name("Peasant".to_string())
-}
-
-fn peasant_health() -> Health {
-    Health(5)
-}
-
-fn peasant_speed() -> Speed {
-    Speed(100.)
-}
-
-fn peasant_attack() -> Attack {
-    Attack::melee(Health(1))
-}
-
-fn peasant_texture() -> Textured {
-    Textured {
-        file: "enemy/Enemy.png".to_string(),
+                ActiveEvents::CONTACT_FORCE_EVENTS,
+                Hardness(1),
+            ))
+            .insert(Damping {
+                linear_damping: 0.5,
+                angular_damping: 1.0,
+            });
     }
 }
 
