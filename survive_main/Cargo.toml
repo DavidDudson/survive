@@ -12,8 +12,8 @@ level = { path = "../level" }
 combat = { path = "../combat" }
 enemy = { path = "../enemy" }
 camera = { path = "../camera" }
-bevy = "0.16.1"
-bevy_rapier2d  = "0.31.0"
+bevy = "0.17.3"
+bevy_rapier2d  = "0.32.0"
 
 [dev-dependencies]
 husky-rs = "0.1.5"

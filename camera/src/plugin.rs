@@ -49,16 +49,13 @@ fn setup(mut commands: Commands) {
 
 fn castle_follow(
     target_query: Query<&Transform, With<Castle>>,
-    mut camera_query: Query<
-        (&mut Transform, &mut OrthographicProjection),
-        (With<Camera>, Without<Castle>),
-    >,
+    mut camera_query: Query<(&mut Transform, &mut Projection), (With<Camera>, Without<Castle>)>,
     time: Res<Time>,
 ) {
     // Get the target position
-    if let Ok(target_transform) = target_query.get_single() {
+    if let Ok(target_transform) = target_query.single() {
         // Get the camera
-        if let Ok((mut camera_transform, mut projection)) = camera_query.get_single_mut() {
+        if let Ok((mut camera_transform, mut projection)) = camera_query.single_mut() {
             let target_position = Vec3::new(
                 target_transform.translation.x,
                 target_transform.translation.y,
@@ -70,10 +67,11 @@ fn castle_follow(
                 .lerp(target_position, 5.0 * time.delta_secs());
 
             let target_scale = 0.5;
-            let current_scale = projection.scale;
-
-            projection.scale =
-                current_scale + (target_scale - current_scale) * 2.0 * time.delta_secs();
+            if let Projection::Orthographic(ref mut ortho) = *projection {
+                let current_scale = ortho.scale;
+                ortho.scale =
+                    current_scale + (target_scale - current_scale) * 2.0 * time.delta_secs();
+            }
         }
     }
 }
@@ -82,18 +80,22 @@ fn castle_follow(
 fn camera_drag(
     mut camera_query: Query<(&mut Transform, &mut CameraDrag), With<Camera>>,
     mouse_button: Res<ButtonInput<MouseButton>>,
-    mut mouse_motion_events: EventReader<MouseMotion>,
-    mut scroll_events: EventReader<MouseWheel>,
-    mut projection_query: Query<&mut OrthographicProjection, With<Camera>>,
+    mut mouse_motion_events: MessageReader<MouseMotion>,
+    mut scroll_events: MessageReader<MouseWheel>,
+    mut projection_query: Query<&mut Projection, With<Camera>>,
     dragged_entity: Query<&Dragged>,
     time: Res<Time>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
     // Handle camera dragging
-    let (mut camera_transform, mut camera_drag) = camera_query.single_mut();
+    let Ok((mut camera_transform, mut camera_drag)) = camera_query.single_mut() else {
+        return;
+    };
 
     let current_time = time.elapsed_secs();
-    let window = window_query.single();
+    let Ok(window) = window_query.single() else {
+        return;
+    };
 
     // Get the current cursor position
     let current_cursor_pos = window.cursor_position();
@@ -164,8 +166,14 @@ fn camera_drag(
     if camera_drag.dragging {
         for event in mouse_motion_events.read() {
             // Get the current projection scale to adjust drag sensitivity
-            let projection = projection_query.single();
-            let scale_factor = projection.scale;
+            let Ok(projection) = projection_query.single() else {
+                continue;
+            };
+            let scale_factor = if let Projection::Orthographic(ref ortho) = *projection {
+                ortho.scale
+            } else {
+                1.0
+            };
 
             // Move camera in the opposite direction of mouse movement
             // Scale the movement by the projection scale to maintain consistent drag feel at different zoom levels
@@ -186,10 +194,12 @@ fn camera_drag(
     }
 
     // Smoothly interpolate towards the target scale
-    if let Ok(mut projection) = projection_query.get_single_mut() {
+    if let Ok(mut projection) = projection_query.single_mut() {
         let zoom_speed = 5.0; // Adjust this value to control zoom smoothness (higher = faster)
-        projection.scale = projection.scale
-            + (camera_drag.target_scale - projection.scale) * zoom_speed * time.delta_secs();
+        if let Projection::Orthographic(ref mut ortho) = *projection {
+            ortho.scale = ortho.scale
+                + (camera_drag.target_scale - ortho.scale) * zoom_speed * time.delta_secs();
+        }
     }
 }
 
@@ -203,8 +213,12 @@ fn drag_system(
     mouse_button: Res<ButtonInput<MouseButton>>,
     mut commands: Commands,
 ) {
-    let window = window_query.single();
-    let (camera, camera_transform, camera_drag) = camera_query.single();
+    let Ok(window) = window_query.single() else {
+        return;
+    };
+    let Ok((camera, camera_transform, camera_drag)) = camera_query.single() else {
+        return;
+    };
 
     // Get the current mouse position in world coordinates
     let cursor_position = if let Some(cursor_position) = window.cursor_position() {
@@ -212,13 +226,13 @@ fn drag_system(
         if let Ok(world_position) = camera.viewport_to_world_2d(camera_transform, cursor_position) {
             world_position
         } else {
-            if let Ok((entity, _, _)) = dragged.get_single() {
+            if let Ok((entity, _, _)) = dragged.single() {
                 commands.entity(entity).remove::<Dragged>();
             }
             return; // Cursor not in world
         }
     } else {
-        if let Ok((entity, _, _)) = dragged.get_single() {
+        if let Ok((entity, _, _)) = dragged.single() {
             commands.entity(entity).remove::<Dragged>();
         }
         return; // Cursor not in window
@@ -226,7 +240,7 @@ fn drag_system(
 
     // Check if we're already dragging a peasant
     let mut dragging = false;
-    if let Ok((entity, mut transform, mut external_impulse)) = dragged.get_single_mut() {
+    if let Ok((entity, mut transform, mut external_impulse)) = dragged.single_mut() {
         dragging = true;
 
         // If mouse button is released, stop dragging

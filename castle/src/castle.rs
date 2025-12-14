@@ -6,7 +6,7 @@ use models::health::Health;
 use models::name::Name;
 
 #[derive(Component)]
-#[require(Name(castle_name), Health(castle_health), RigidBody(castle_body))]
+#[require(Name, Health, RigidBody::Fixed)]
 pub struct Castle;
 
 impl Castle {
@@ -17,6 +17,8 @@ impl Castle {
     ) {
         commands.spawn((
             Castle,
+            Name("Castle".to_string()),
+            Health(20),
             Mesh2d(meshes.add(Rectangle::new(300., 150.))),
             MeshMaterial2d(materials.add(Color::from(GREY))),
             Transform::from_xyz(1920. / 4., 75., 0.),
@@ -24,16 +26,4 @@ impl Castle {
             Hardness(10),
         ));
     }
-}
-
-fn castle_name() -> Name {
-    Name("Castle".to_string())
-}
-
-fn castle_health() -> Health {
-    Health(20)
-}
-
-fn castle_body() -> RigidBody {
-    RigidBody::Fixed
 }

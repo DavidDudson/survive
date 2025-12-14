@@ -50,6 +50,6 @@ fn spawn_waves(
 
 fn cleanup(mut commands: Commands, query: Query<Entity, With<Enemy>>) {
     for entity in query.iter() {
-        commands.entity(entity).despawn_recursive();
+        commands.entity(entity).despawn();
     }
 }
