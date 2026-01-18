@@ -23,9 +23,9 @@ impl Plugin for CameraPlugin {
         app.add_systems(Startup, setup).add_systems(
             Update,
             (
-                castle_follow.run_if(not(
-                    in_state(GameState::Playing).or(in_state(GameState::Paused))
-                )),
+                castle_follow.run_if(
+                    in_state(GameState::MainMenu).or(in_state(GameState::GameOver)),
+                ),
                 camera_drag.run_if(in_state(GameState::Playing)),
                 drag_system.run_if(in_state(GameState::Playing)),
             ),

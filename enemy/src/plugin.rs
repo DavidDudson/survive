@@ -15,20 +15,21 @@ impl Plugin for EnemyPlugin {
 }
 
 fn move_enemy(
-    _time: Res<Time>,
-    enemy: Query<(Entity, &Speed), (With<Velocity>, Without<Dragged>)>,
+    mut enemy: Query<(Entity, &Speed, &mut Velocity), Without<Dragged>>,
     scenery: Query<Entity, With<Scenery>>,
-    mut velocity: Query<&mut Velocity>,
     rapier_context: ReadRapierContext,
 ) {
-    for (entity, speed) in &enemy {
-        if let Ok(mut vel) = velocity.get_mut(entity) {
-            let Ok(context) = rapier_context.single() else {
-                continue;
-            };
-            if let Some(_) = context.contact_pair(entity, scenery.iter().next().unwrap()) {
-                vel.linvel.x = speed.0
-            }
+    let Some(scenery_entity) = scenery.iter().next() else {
+        return;
+    };
+
+    let Ok(context) = rapier_context.single() else {
+        return;
+    };
+
+    for (entity, speed, mut vel) in &mut enemy {
+        if context.contact_pair(entity, scenery_entity).is_some() {
+            vel.linvel.x = speed.0;
         }
     }
 }

@@ -23,7 +23,7 @@ impl Ground {
             MeshMaterial2d(materials.add(Color::from(GREEN))),
             Transform::from_xyz(0., -480., 0.),
             Collider::cuboid(5000. / 2., 980. / 2.),
-            ActiveEvents::COLLISION_EVENTS,
+            ActiveEvents::CONTACT_FORCE_EVENTS,
         ));
     }
 }
